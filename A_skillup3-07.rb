@@ -81,9 +81,66 @@ OUTPUT2 = <<~"EOS"
   ......#..***.......................#.#.
 EOS
 
-class Snake
-  attr_reader :body
+INPUT3 = <<~"EOS"
+  19 19 2 16 36
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  ...................
+  .....############..
+  ................#..
+  .....############..
+  2 L
+  17 L
+  19 L
+  33 R
+  36 R
+  37 L
+  38 R
+  39 L
+  40 R
+  41 L
+  42 R
+  43 L
+  44 R
+  45 L
+  46 R
+  47 L
+  48 R
+  49 L
+  50 R
+  51 L
+  52 R
+  53 L
+  54 R
+  55 L
+  56 R
+  57 L
+  58 R
+  59 L
+  60 R
+  61 L
+  62 R
+  63 L
+  64 R
+  65 L
+  66 R
+  67 L
+EOS
 
+class Snake
   def initialize(y, x)
     @y = y
     @x = x
@@ -99,10 +156,10 @@ class Snake
     @body.include?([y, x])
   end
 
-  def turn(m)
-    if m == "L"
+  def turn(d)
+    if d == "L"
       @d = (@d - 1) % 4
-    elsif m == "R"
+    elsif d == "R"
       @d = (@d + 1) % 4
     end
   end
@@ -129,65 +186,39 @@ class Snake
   end
 end
 
-class Field
-  def initialize(h, w, field_data)
-    @h = h
-    @w = w
-    @field_data = field_data
-  end
-
-  def valid?(y, x)
-    return false if @field_data[y][x] == "#"
-    return false if y < 0 || @h < y
-    return false if x < 0 || @w < x
-    true
-  end
-end
-
 def solve(input_lines)
+  # 入力データ受け取り
   input_lines = input_lines.split("\n")
   h, w, sy, sx, n = input_lines.shift.split.map(&:to_i)
-  field_data = input_lines.shift(h).map { |line| line.chars }
-  requests = input_lines.shift(n).map do |line|
+  field = input_lines.shift(h).map { |line| line.chars }
+  requests = Array.new(100, nil)
+  input_lines.shift(n).each do |line|
     t, d = line.split
-    [t.to_i, d]
+    requests[t.to_i] = d
   end
 
-  field = Field.new(h, w, field_data)
+  # 初期化
   snake = Snake.new(sy, sx)
+  field[sy][sx] = "*"
 
-  count = 0
-  last = 100
-  stop = false
-  while count < last
-    if 0 < requests.length
-      t, m = requests.shift
-    else
-      t = last
-    end
-    # ターンの時間になるか, ぶつかるまで前進
-    while count < t
-      ny, nx = snake.next_pos(move = false)
-      if field.valid?(ny, nx) && !snake.body?(ny, nx)
-        snake.next_pos(move = true)
-        count += 1
-      else
-        stop = true
-        break
-      end
-    end
-    break if stop
-    snake.turn(m)
+  # snake と field の更新
+  requests.each do |d|
+    snake.turn(d) unless d.nil?
+    ny, nx = snake.next_pos
+
+    break if ny < 0 || h - 1 < ny
+    break if nx < 0 || w - 1 < nx
+    break if snake.body?(ny, nx)
+
+    y, x = snake.move_forward
+    field[y][x] = "*"
   end
 
-  snake.body.each do |y, x|
-    field_data[y][x] = "*"
-  end
-  field_data.map { |line| line.join }.join("\n") << "\n"
+  # 出力
+  field.map { |line| line.join }.join("\n") << "\n"
 end
 
-puts solve(INPUT2)
-p solve(INPUT2) == OUTPUT2
+puts solve(STDIN.read)
 
 =begin
 へび (paizaランク A 相当)
