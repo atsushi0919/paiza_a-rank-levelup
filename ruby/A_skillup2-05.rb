@@ -70,6 +70,7 @@ EOS
 solve(input_data2.split("\n"))
 
 =begin
+https://paiza.jp/works/mondai/a_rank_level_up_problems/a_rank_snake_move_boss
 座標系での向きの変わる移動 (paizaランク B 相当)
 Img 04 03 下記の問題をプログラミングしてみよう！
 開始時点の x , y 座標,移動の回数 N が与えられます。
